@@ -27,7 +27,7 @@ function generateRandomPolyCollection(isize, res, ctxInit) {
             // the inner loops collect the average 
             // color of the underlying pixels
 			var 
-                ic = [{r: 0, g: 0, b: 0, c: 0},{r: 0, g: 0, b: 0, c: 0},{r: 0, g: 0, b: 0, c: 0},{r: 0, g: 0, b: 0, c: 0},{r: 0, g: 0, b: 0, c: 0}];
+                ic = [{r: 0, g: 0, b: 0},{r: 0, g: 0, b: 0},{r: 0, g: 0, b: 0},{r: 0, g: 0, b: 0},{r: 0, g: 0, b: 0}];
 
             // upper triangle
 			for (var iy = 0; iy<resh; iy++) {
@@ -86,13 +86,15 @@ function generateRandomPolyCollection(isize, res, ctxInit) {
                 col.push({
                     r: ic[i].r / div,
                     g: ic[i].g / div,
-                    b: ic[i].b / div
+                    b: ic[i].b / div,
+                    c: 0
                 });
 
                 col.push({
                     r: ic[4].r,
                     g: ic[4].g,
-                    b: ic[4].b
+                    b: ic[4].b,
+                    c: 0
                 });
             }
         }
@@ -317,35 +319,57 @@ function mutatePolyCollectionPoints(pc, mf) {
 // changes one color slightly
 // @todo: ranking of colors
 function mutatePolyCollectionColors(pc, mf) {
-	var p = Math.floor(Math.random() * pc.col.length),
+	var cols = pc.col,
+        cl = cols.length,
+        p = Math.floor(Math.random() * pc.col.length),
 		c = pc.col[p],
         mfh = mf/2,
-        r = Math.floor(Math.random() * 3);
+        r = Math.floor(Math.random() * 3),
+        sct = 0;
 
-        switch (r) {
-            case 0:
-                pc.col[p] = {
-                    r: Math.max(0, Math.min(255, c.r + Math.random()*mf-mfh)),
-                    g: c.g,
-                    b: c.b,
-                    c: c.c
-                }; break;
-            case 1:
-                pc.col[p] = {
-                    r: c.r,
-                    g: Math.max(0, Math.min(255, c.g + Math.random()*mf-mfh)),
-                    b: c.b,
-                    c: c.c
-                }; break;
-            case 2:
-                pc.col[p] = {
-                    r: c.r,
-                    g: c.g,
-                    b: Math.max(0, Math.min(255, c.b + Math.random()*mf-mfh)),
-                    c: c.c
-                };
+    for (var i=0; i<cl; i++)
+        sct += cols[i].c+1;
+
+    var rpos = Math.random() * sct, tc = 0;
+
+    for (var i=0; i<cl; i++) {
+        for (var j=0; j<cols[i].c+1; j++) {
+            tc += 1;
+            if (tc >= rpos) {
+                switch (r) {
+                    case 0:
+                        pc.col[i] = {
+                            r: Math.max(0, Math.min(255, c.r + Math.random()*mf-mfh)),
+                            g: c.g,
+                            b: c.b,
+                            c: c.c
+                        }; break;
+                    case 1:
+                        pc.col[i] = {
+                            r: c.r,
+                            g: Math.max(0, Math.min(255, c.g + Math.random()*mf-mfh)),
+                            b: c.b,
+                            c: c.c
+                        }; break;
+                    case 2:
+                        pc.col[i] = {
+                            r: c.r,
+                            g: c.g,
+                            b: Math.max(0, Math.min(255, c.b + Math.random()*mf-mfh)),
+                            c: c.c
+                        };
+                }
+
+                return i;
+            }
         }
-    return p;
+    }
+
+    console.log(tc, i, j);
+
+    console.log('this should never happen: randomizer didn\'t find a suitable color');
+    throw 'noooo!';
+    return null;
 }
 
 

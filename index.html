@@ -106,8 +106,8 @@
                         // log successfull a point was in changing
                         if (generation % 2 == 0 && mutp > 0)
                             son.pts[cp.y][cp.x].c += 1;
-                        else if (generation % 2 == 0 && mutp > 0) {
-                            son.cols[cc].c += 1;
+                        else if (generation % 2 == 1 && mutc > 0) {
+                            son.col[cc].c += 1;
                         }
 
                         // draw new image
